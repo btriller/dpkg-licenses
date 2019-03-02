@@ -49,7 +49,7 @@ else
   printf "$format" "--" "----" "-------" "----" "-----------" "--------"
 fi
 
-COLUMNS=2000 dpkg -l | grep '^.[iufhwt]' | while read pState package pVer pArch pDesc; do
+COLUMNS=2000 dpkg-query -W -f '${db:Status-Abbrev} ${Package} ${Version} ${Architecture} "${Homepage}" ${binary:Summary}\n' | grep '^.[iufhwt]' | while read pState package pVer pArch pHomepage pDesc ; do
   license=
   for method in "$SCRIPTLIB"/reader*; do
     [ -f "$method" ] || continue
@@ -64,7 +64,7 @@ COLUMNS=2000 dpkg -l | grep '^.[iufhwt]' | while read pState package pVer pArch 
 
   if [[ $CSV -eq 1 ]]
   then
-    printf "\"$pState\",\"$package\",\"$pVer\",\"$pArch\",\"$pDesc\",\"$license\"\n"
+    printf "\"$pState\",\"$package\",\"$pVer\",\"$pArch\",\"${pDesc//\"/\"\"}\",${pHomepage},\"$license\"\n"
   else
     printf "$format" "$pState" "${package:0:30}" "${pVer:0:30}" "${pArch:0:6}" "${pDesc:0:60}" "$license"
   fi 
